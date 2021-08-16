@@ -42,8 +42,19 @@ class ConversationsViewController: UIViewController {
     
     @objc private func didTapCompose() {
         let vc = NewConversationViewController()
+        vc.completion = { [weak self] result in
+            print("\(result)")
+            self?.createNewConversation(result: result)
+        }
         let navVc = UINavigationController(rootViewController: vc)
         present(navVc, animated: true)
+    }
+    
+    private func createNewConversation(result: [String: String]) {
+        let vc = ChatViewController()
+        vc.title = "Robert Ners"
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     override func viewDidLayoutSubviews() {

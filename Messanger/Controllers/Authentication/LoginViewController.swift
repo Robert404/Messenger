@@ -138,13 +138,14 @@ class LoginViewController: UIViewController {
             }
             
             let user = res.user
+            UserDefaults.standard.setValue(email, forKey: "email")
             print("Logged in: \(user)")
             self?.navigationController?.dismiss(animated: true, completion: nil)
         })
     }
     
     func alertUserLogin() {
-        let alert = UIAlertController(title: "Oops", message: "Enter information is not correct", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Oops", message: "Entered information is not correct", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
         present(alert, animated: true)
     }

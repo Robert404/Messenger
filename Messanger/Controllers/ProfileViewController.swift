@@ -19,8 +19,54 @@ class ProfileViewController: UIViewController {
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         table.delegate = self
         table.dataSource = self
+        table.tableHeaderView = createTableHeader()
     }
     
+    func createTableHeader() -> UIView? {
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else { return nil }
+        let safeEmail = DatabaseManager.safeEmail(email: email)
+        let fileName = safeEmail + "_profile_pic.png"
+        
+        let path = "images/" + fileName
+        
+        
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: 300))
+        view.backgroundColor = .link
+        
+        let imageView = UIImageView(frame: CGRect(x: (view.width - 150) / 2, y: 75, width: 150, height: 150))
+        
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.backgroundColor = .white
+        imageView.layer.borderWidth = 3
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = imageView.width / 2
+        
+        StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
+            switch result {
+            case .failure(let error):
+                print("Failed to download url: \(error)")
+            case .success(let url):
+                self?.downloadImage(imageView: imageView, url: url)
+            }
+        })
+        
+        view.addSubview(imageView)
+        
+        return view
+    }
+    
+    func downloadImage(imageView: UIImageView, url: URL) {
+        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            DispatchQueue.main.async {
+                let image = UIImage(data: data)
+                imageView.image = image
+            }
+        }).resume()
+    }
 }
 
 
